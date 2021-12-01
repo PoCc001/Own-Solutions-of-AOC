@@ -11,7 +11,9 @@ namespace aoc {
 		std::ifstream in(name, std::ios::in);
 
 		if (!in) {
-			return std::vector<std::string>{};
+			std::cout << "File \"" << name << "\" doesn't exist!\nAbort!" << std::endl;
+			system("PAUSE");
+			exit(1);
 		}
 		else {
 			std::size_t s = 100;
