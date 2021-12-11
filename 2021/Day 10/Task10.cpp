@@ -81,7 +81,7 @@ bool isOpeningBracket(char b) {
 	}
 }
 
-std::list<uint64_t> getSortedList(std::list<uint64_t>& l) {		// Inefficience alert!!
+std::list<uint64_t> getSortedList(std::list<uint64_t>& l) {		// look away, if you're allergic to inefficient/hacky sorting algorithms!
 	std::list<uint64_t> sorted{};
 	while (!l.empty()) {
 		std::uint64_t max = 0;
