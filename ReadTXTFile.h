@@ -12,7 +12,7 @@ namespace aoc {
 
 		if (!in) {
 			std::cout << "File \"" << name << "\" doesn't exist!\nAbort!" << std::endl;
-			system("PAUSE");
+			std::system("PAUSE");
 			exit(1);
 		}
 		else {
@@ -29,6 +29,16 @@ namespace aoc {
 
 			return v;
 		}
+	}
+
+	std::string substrIndizes(const std::string& str, std::size_t begin, std::size_t end) {
+		if (end < begin) {
+			std::cout << "Second bound is smaller than the first one!" << std::endl;
+			std::system("PAUSE");
+			exit(1);
+		}
+
+		return str.substr(begin, end - begin);
 	}
 
 	typedef std::vector<std::string> stringArray;
