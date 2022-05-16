@@ -12,6 +12,7 @@ namespace aoc {
 
 		if (!in) {
 			std::cout << "File \"" << name << "\" doesn't exist!\nAbort!" << std::endl;
+			in.close();
 			std::system("PAUSE");
 			exit(1);
 		}
@@ -24,6 +25,8 @@ namespace aoc {
 			while (std::getline(in, v[v.size() - 1])) {
 				v.resize(v.size() + 1);
 			}
+			
+			in.close();
 
 			v.resize(v.size() - 1);
 
