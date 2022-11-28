@@ -96,6 +96,12 @@ stringArray fileToStringArray(const char* name) {
         }
         
         char* arr = (char*)(calloc(byteSize, sizeof(char)));
+
+        if (arr == NULL) {
+            puts("Memory allocation failed!\nAbort!\n");
+            fclose(file);
+            exit(1);
+        }
         
         c = fgetc(file);
         size_t i = 0;
@@ -115,6 +121,12 @@ stringArray fileToStringArray(const char* name) {
         }
         
         stringArray strArr = {lines, (char**)(calloc(lines, sizeof(char*)))};
+
+        if (strArr.arr == NULL) {
+            puts("Memory allocation failed!\nAbort!\n");
+            free(arr);
+            exit(1);
+        }
         
         size_t gi = 0;
         size_t rowSize = 0;
@@ -131,6 +143,12 @@ stringArray fileToStringArray(const char* name) {
         for (i = 0; i < lines; i++) {
             size_t col = 0;
             while (arr[gi] != '\n' && gi < byteSize) {
+                if (strArr.arr[i] == NULL) {
+                    puts("Memory allocation failed!\nAbort!\n");
+                    freeStringArray(&strArr);
+                    free(arr);
+                }
+
                 strArr.arr[i][col] = arr[gi];
                 col++;
                 gi++;
@@ -147,17 +165,25 @@ stringArray fileToStringArray(const char* name) {
     
 void freeStringArray(stringArray* arr) {
     if (arr != NULL) {
-        for (size_t i = 0; i < arr->rows; i++) {
-            free(arr->arr[i]);
-        }
+        if (arr->arr != NULL) {
+            for (size_t i = 0; i < arr->rows; i++) {
+                if (arr->arr[i] != NULL) {
+                    free(arr->arr[i]);
+                }
+            }
     
-        free(arr->arr);
+            free(arr->arr);
+        }
         arr->arr = NULL;
         arr->rows = 0;
     }
 }
 
 char* getString(const stringArray* strArr, size_t r) {
+    if (strArr == NULL) {
+        return NULL;
+    }
+
     if (r >= strArr->rows) {
         return NULL;
     } else {
@@ -192,7 +218,7 @@ char* getSubstring(const char* str, size_t begin, size_t end) {
     }
 }
 
-stringArray divideString(const char* str, const char* del) {
+stringArray divideString(const char* str, const char* del) {    
         size_t dellength = 0;
         while (del[dellength] != '\0') {
             dellength++;
