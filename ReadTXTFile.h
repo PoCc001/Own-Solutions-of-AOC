@@ -77,12 +77,12 @@ stringArray fileToStringArray(const char* name) {
     } else {
         size_t byteSize = 0;
         size_t lines = 1;
-        char c = fgetc(file);
+        int c = fgetc(file);
         
         while (c != EOF) {
             byteSize++;
             
-            if (c == '\n') {
+            if ((char)(c) == '\n') {
                 lines++;
             }
             
@@ -101,7 +101,7 @@ stringArray fileToStringArray(const char* name) {
         size_t i = 0;
         
         while (c != EOF && i < byteSize) {
-            arr[i] = c;
+            arr[i] = (char)(c);
             i++;
             c = fgetc(file);
         }
