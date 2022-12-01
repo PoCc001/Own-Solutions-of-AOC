@@ -68,6 +68,22 @@ typedef struct stringArrayType {
     char** arr;
 } stringArray;
 
+void freeStringArray(stringArray* arr) {
+    if (arr != NULL) {
+        if (arr->arr != NULL) {
+            for (size_t i = 0; i < arr->rows; i++) {
+                if (arr->arr[i] != NULL) {
+                    free(arr->arr[i]);
+                }
+            }
+    
+            free(arr->arr);
+        }
+        arr->arr = NULL;
+        arr->rows = 0;
+    }
+}
+
 stringArray fileToStringArray(const char* name) {
     FILE* file = fopen(name, "r");
     
@@ -160,22 +176,6 @@ stringArray fileToStringArray(const char* name) {
         free(arr);
         
         return strArr;
-    }
-}
-    
-void freeStringArray(stringArray* arr) {
-    if (arr != NULL) {
-        if (arr->arr != NULL) {
-            for (size_t i = 0; i < arr->rows; i++) {
-                if (arr->arr[i] != NULL) {
-                    free(arr->arr[i]);
-                }
-            }
-    
-            free(arr->arr);
-        }
-        arr->arr = NULL;
-        arr->rows = 0;
     }
 }
 
