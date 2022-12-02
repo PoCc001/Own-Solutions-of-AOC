@@ -63,6 +63,10 @@ namespace aoc {
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#pragma warning(disable : 4996) // Use this to make the code run in Microsoft Visual Studio - alternatively use fopen_s() instead of fopen().
+#endif
+
 typedef struct stringArrayType {
     size_t rows;
     char** arr;
