@@ -64,7 +64,7 @@ namespace aoc {
 #include <stdlib.h>
 
 #if defined(_MSC_VER)
-#pragma warning(disable : 4996) // Use this to make the code run in Microsoft Visual Studio - alternatively use fopen_s() instead of fopen().
+#pragma warning(disable : 4996)
 #endif
 
 typedef struct stringArrayType {
@@ -156,6 +156,9 @@ stringArray fileToStringArray(const char* name) {
                 rowSize++;
                 gi++;
             }
+
+            gi++;
+
             strArr.arr[i] = (char*)(calloc(rowSize + 1, sizeof(char)));
         }
         
