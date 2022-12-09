@@ -132,7 +132,7 @@ public class Task8 {
     }
 
     public static void main(String[] args) {
-        String[] arr = AOCUtils.fileToStringArray("/home/johannes/Schreibtisch/AdventOfCode/Inputs/Input8.txt");
+        String[] arr = AOCUtils.fileToStringArray("Input8.txt");
         Tree[][] grid = new Tree[arr.length][arr[0].length()];
         fillGrid(grid, arr);
 

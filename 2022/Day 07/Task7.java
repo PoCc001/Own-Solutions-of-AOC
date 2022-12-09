@@ -191,7 +191,7 @@ public class Task7 {
     }
 
     public static void main(String[] args) {
-        String[] arr = AOCUtils.fileToStringArray("/home/johannes/Schreibtisch/AdventOfCode/Inputs/Input7.txt");
+        String[] arr = AOCUtils.fileToStringArray("Input7.txt");
         FileTree tree = new FileTree();
 
         int line = 0;
