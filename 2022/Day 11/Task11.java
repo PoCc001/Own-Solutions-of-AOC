@@ -175,6 +175,6 @@ public class Task11 {
         max = sortedMonkeys.last().getOverallItemCount();
         secondMax = sortedMonkeys.headSet(sortedMonkeys.last()).last().getOverallItemCount();
 
-        System.out.println("Part 1: " + (max * secondMax));
+        System.out.println("Part 2: " + (max * secondMax));
     }
 }
