@@ -8,7 +8,7 @@ section .note.GNU-stack         ; so that the linker (gcc) does not complain abo
 
 section .text
 ; These functions can be called from another assembly file so to say and are deemed ready for production (at least in AOC ;-))
-global aoc_print, aoc_println, aoc_strlen, aoc_memcpy, aoc_memmove, aoc_int_to_decstr, aoc_uint_to_decstr, aoc_decstr_to_int, aoc_abort_msg, aoc_file_to_string_array
+global aoc_print, aoc_println, aoc_strlen, aoc_memcpy, aoc_memmove, aoc_int_to_decstr, aoc_uint_to_decstr, aoc_decstr_to_int, aoc_abort_msg, aoc_file_to_string_array, aoc_malloc, aoc_free, aoc_free_string, aoc_free_string_array
 
 
 ; INPUTS:
@@ -672,6 +672,95 @@ aoc_file_to_string_array:
     pop r12
     pop r14
     add rsp, 16
+    mov rsp, rbp
+    pop rbp
+    ret
+
+; INPUTS:
+; rdi ... number of bytes to allocate on the heap
+; OUTPUTS:
+; rax ... pointer to allocated memory (-1 if unsuccessful)
+aoc_malloc:
+    push rbp
+    mov rbp, rsp
+    mov rsi, rdi
+    xor edi, edi
+    mov edx, 3
+    mov r10d, 34
+    mov r8, -1
+    mov eax, 9
+    syscall
+    mov rsp, rbp
+    pop rbp
+    ret
+
+; INPUTS:
+; rdi ... pointer to memory on the heap that needs to be freed
+; rsi ... length of memory to deallocate in bytes
+; OUTPUTS:
+; rax ... 0 for success; -1 for failure
+aoc_free:
+    push rbp
+    mov rbp, rsp
+
+    mov eax, 11
+    syscall
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+; INPUTS:
+; rdi ... pointer to the string on the heap that needs to be freed
+; OUTPUTS:
+; rax ... 0 for success; -1 for failure
+aoc_free_string:
+    push rbp
+    mov rbp, rsp
+    push rdi
+    call aoc_strlen
+    pop rdi
+    lea rsi, [rax + 1]
+    mov eax, 11
+    syscall
+    mov rsp, rbp
+    pop rbp
+    ret
+
+; INPUTS:
+; rdi ... pointer to the string array
+aoc_free_string_array:
+    push rbp
+    mov rbp, rsp
+    push r15
+    push r14
+    push r13
+    mov r15, [rdi]
+    lea r14, [rdi + 8]
+    xor r13d, r13d
+    .free_loop:
+        cmp r13, r15
+        jz .end
+        mov rdi, [r14 + r13]
+        call aoc_free_string
+        cmp rax, -1
+        jnz .good_free
+        call aoc_abort_msg
+        .good_free:
+        inc r13
+        jmp .free_loop
+
+    .end:
+    lea rdi, [r14 - 8]
+    lea rsi, [r15 * 8 + 8]
+    call aoc_free
+    cmp rax, -1
+    .good_final_free
+    call aoc_abort_msg
+    .good_final_free:
+    pop r13
+    pop r14
+    pop r15
     mov rsp, rbp
     pop rbp
     ret
