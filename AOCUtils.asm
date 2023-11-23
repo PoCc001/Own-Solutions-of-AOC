@@ -755,7 +755,7 @@ aoc_free_string_array:
     lea rsi, [r15 * 8 + 8]
     call aoc_free
     cmp rax, -1
-    .good_final_free
+    jnz .good_final_free
     call aoc_abort_msg
     .good_final_free:
     pop r13
