@@ -8,7 +8,7 @@ section .note.GNU-stack         ; so that the linker (gcc) does not complain abo
 
 section .text
 ; These functions can be called from another assembly file so to say and are deemed ready for production (at least in AOC ;-))
-global aoc_print, aoc_println, aoc_strlen, aoc_memcpy, aoc_memmove, aoc_int_to_decstr, aoc_uint_to_decstr, aoc_decstr_to_int, aoc_abort_msg, aoc_file_to_string_array, aoc_malloc, aoc_free, aoc_free_string, aoc_free_string_array
+global aoc_print, aoc_println, aoc_strlen, aoc_memcpy, aoc_memmove, aoc_int_to_decstr, aoc_uint_to_decstr, aoc_decstr_to_int, aoc_abort_msg, aoc_file_to_string_array, aoc_malloc, aoc_free, aoc_realloc, aoc_free_string, aoc_free_string_array
 
 
 ; INPUTS:
@@ -706,6 +706,45 @@ aoc_free:
     mov eax, 11
     syscall
 
+    mov rsp, rbp
+    pop rbp
+    ret
+
+; INPUTS:
+; rdi ... pointer to memory to be reallocated
+; rsi ... length of old memory region in bytes
+; rcx ... length of new memory region in bytes
+; OUTPUTS:
+; rax ... pointer to the new memory region
+aoc_realloc:
+    push rbp
+    mov rbp, rsp
+    test rcx, rcx
+    jz .free
+    push rdi
+    push rsi
+    push rcx
+    mov rdi, rcx
+    call aoc_malloc
+    push rax
+    cmp rax, -1
+    jz .done_copying
+    mov rdi, rax
+    mov rsi, [rsp + 16]
+    mov rcx, [rsp + 8]
+    mov rdx, [rsp]
+    cmp rcx, rdx
+    cmovns rcx, rdx
+    call aoc_memcpy
+    .done_copying:
+    pop rax
+    pop rcx
+    pop rsi
+    pop rdi
+    .free:
+    push rax
+    call aoc_free
+    pop rax
     mov rsp, rbp
     pop rbp
     ret
