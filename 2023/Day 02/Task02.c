@@ -1,8 +1,7 @@
-#include "AOCUtils.h"
+#include "ReadTXTFile.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <math.h>
 
 #define MAX(x, y) ((x) < (y) ? (y) : (x))
 
