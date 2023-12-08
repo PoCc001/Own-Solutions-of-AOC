@@ -116,6 +116,26 @@ public class AOCUtils {
         return l;
     }
 
+    public static <T> List<Integer> getAllIndices(List<T> l, T t) {
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < l.size(); i++) {
+            if (Objects.equals(l.get(i), t)) {
+                indices.add(i);
+            }
+        }
+        return indices;
+    }
+
+    public static <T> List<Integer> getAllIndices(List<T> l, Predicate<? super T> predicate) {
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < l.size(); i++) {
+            if (predicate.test(l.get(i))) {
+                indices.add(i);
+            }
+        }
+        return indices;
+    }
+
     public static IntStream stringsToInts(Stream<String> ss, String... dividers) {
         if (dividers.length == 0) {
             return ss.mapToInt(Integer::parseInt);
