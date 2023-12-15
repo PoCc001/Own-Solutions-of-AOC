@@ -170,6 +170,7 @@ stringArray fileToStringArray(const char* name) {
                     puts("Memory allocation failed!\nAbort!\n");
                     freeStringArray(&strArr);
                     free(arr);
+                    exit(1);
                 }
 
                 strArr.arr[i][col] = arr[gi];
