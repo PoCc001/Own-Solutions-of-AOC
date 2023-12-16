@@ -151,7 +151,7 @@ data class AOC(val day : Int, val test : Int) {
     operator fun unaryPlus() {
         result = null
         fn()
-        println("Result $partCount: $result")
+        println("Part $partCount: $result")
     }
 
     operator fun unaryMinus() {
