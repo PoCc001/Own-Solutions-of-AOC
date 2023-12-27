@@ -1,3 +1,4 @@
+import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -62,21 +63,21 @@ object Input {
 
     operator fun invoke(day : Int, testID : Int = 0) : Input {
         if (testID == 0) {
-            val path = Path.of("Input" + day.toString(2) + ".txt")
+            val path = Path.of(day.toString(2) + ".txt")
             if (path.exists()) {
                 content = Files.readAllLines(path)
             } else {
                 error("File \"${path.name}\" does not exist!")
             }
         } else if (testID == 1) {
-            val path = Path.of("Input" + day.toString(2) + "-Test.txt")
+            val path = Path.of(day.toString(2) + "-Test.txt")
             if (path.exists()) {
                 content = Files.readAllLines(path)
             } else {
                 error("File \"${path.name}\" does not exist!")
             }
         } else {
-            val path = Path.of("Input" + day.toString(2) + "-Test" + testID + ".txt")
+            val path = Path.of(day.toString(2) + "-Test" + testID + ".txt")
             if (path.exists()) {
                 content = Files.readAllLines(path)
             } else {
@@ -131,7 +132,8 @@ data class AOC(val day : Int, val test : Int) {
         set(any) {
             field = any
         }
-    private var fn : AOC.() -> Unit = {}
+    private var latest : AOC.() -> Unit = {}
+    private var secondToLast : AOC.() -> Unit = {}
     private var partCount = 0
     val input = Input(day, test)
     val lines : List<String>
@@ -142,15 +144,15 @@ data class AOC(val day : Int, val test : Int) {
         get() = input.columns
 
     fun part(fn : AOC.() -> Unit) : AOC {
-
         partCount++
-        this.fn = fn
+        this.secondToLast = this.latest
+        this.latest = fn
         return this
     }
 
     operator fun unaryPlus() {
         result = null
-        fn()
+        latest()
         println("Part $partCount: $result")
     }
 
@@ -159,7 +161,11 @@ data class AOC(val day : Int, val test : Int) {
     }
 
     operator fun not() {
-        fn()
+        latest()
+    }
+
+    fun repeatPreviousPart() {
+        secondToLast()
     }
 }
 
@@ -170,10 +176,16 @@ fun aoc(day : Int, test : Int = 0, fn : AOC.() -> Unit) {
 
 data class Coordinate(val x : Int, val y : Int) {
     constructor(str : String) : this(str.split(",")[0].trim().toInt(), str.split(",")[1].trim().toInt())
-    fun up(amount : Int = 1) = Coordinate(x, y - 1)
-    fun left(amount : Int = 1) = Coordinate(x - 1, y)
-    fun down(amount : Int = 1) = Coordinate(x, y + 1)
-    fun right(amount : Int = 1) = Coordinate(x + 1, y)
+    fun up(amount : Int = 1) = Coordinate(x, y - amount)
+    fun left(amount : Int = 1) = Coordinate(x - amount, y)
+    fun down(amount : Int = 1) = Coordinate(x, y + amount)
+    fun right(amount : Int = 1) = Coordinate(x + amount, y)
+    fun move(direction : Direction, amount : Int = 1) = when (direction) {
+        Direction.UP -> up(amount)
+        Direction.RIGHT -> right(amount)
+        Direction.DOWN -> down(amount)
+        Direction.LEFT -> left(amount)
+    }
     override fun toString() = "($x, $y)"
 }
 
@@ -182,3 +194,90 @@ enum class Direction {
 }
 
 fun <T, R>Sequence<T>.cross(that : Sequence<R>) = flatMap { first -> that.flatMap { second -> sequenceOf(first to second) } }
+fun <T>Sequence<T>.sqr() = this.cross(this)
+
+class Fraction : Comparable<Fraction> {
+    val numerator : BigInteger
+    val denominator : BigInteger
+
+    constructor(n : BigInteger, d : BigInteger) {
+        if (d.signum() == 0) {
+            error("Denominator is 0!")
+        }
+        val gcd = if (n.signum() != 0) n.gcd(d) else d.abs()
+        numerator = if (n.signum() == d.signum()) {
+            n.abs() / gcd
+        } else {
+            -(n.abs()) / gcd
+        }
+        denominator = d.abs() / gcd
+    }
+
+    constructor(n : BigInteger) : this(n, BigInteger.ONE)
+
+    operator fun plus(other : Fraction) : Fraction {
+        val d = denominator * other.denominator
+        return Fraction(((numerator * other.denominator) + (other.numerator * denominator)), d)
+    }
+
+    operator fun unaryMinus() = Fraction(-numerator, denominator)
+
+    operator fun minus(other : Fraction) = this + -other
+
+    operator fun times(other : Fraction) = Fraction(numerator * other.numerator, denominator * other.denominator)
+
+    fun reciprocal() : Fraction {
+        if (numerator.signum() == 0) {
+            error("Cannot invert 0!")
+        }
+        return Fraction(denominator, numerator)
+    }
+
+    operator fun div(other : Fraction) = this * other.reciprocal()
+
+    override fun toString() = "($numerator / $denominator)"
+
+    fun toDouble() = numerator.toDouble() / denominator.toDouble()
+
+    fun signum() = numerator.signum()
+
+    override infix fun compareTo(other: Fraction): Int {
+        return if (signum() > other.signum()) {
+            1
+        } else if (signum() < other.signum()) {
+            -1
+        } else if (signum() == 0) {
+            0
+        } else if (signum() == 1) {
+            val n = numerator * other.denominator
+            val on = other.numerator * denominator
+            return n compareTo on
+        } else {
+            val n = numerator * other.denominator
+            val on = other.numerator * denominator
+            return -(-n compareTo -on)
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Fraction
+
+        if (numerator != other.numerator) return false
+        return denominator == other.denominator
+    }
+
+    override fun hashCode(): Int {
+        var result = numerator.hashCode()
+        result = 31 * result + denominator.hashCode()
+        return result
+    }
+}
+infix fun BigInteger.over(that : BigInteger) = Fraction(this, that)
+infix fun Long.over(that : Long) = BigInteger.valueOf(this) over BigInteger.valueOf(that)
+infix fun Int.over(that : Int) = this.toLong() over that.toLong()
+fun BigInteger.toFraction() = Fraction(this)
+fun Long.toFraction() = this over 1L
+fun Int.toFraction() = this over 1
