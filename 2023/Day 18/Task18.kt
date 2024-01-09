@@ -3,7 +3,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 fun main() {
-    aoc(18, 1) {
+    aoc(18) {
         +part {
             val coordinates = mutableListOf<Coordinate>()
             coordinates += Coordinate(0, 0)
