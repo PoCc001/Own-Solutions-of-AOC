@@ -5,6 +5,8 @@ import kotlin.io.path.exists
 import kotlin.io.path.name
 import kotlin.math.max
 
+const val BASE_PATH = "Input"
+
 fun Int.toString(minDigits : Int) : String {
     val str = toString()
     return if (str[0] == '-') {
@@ -63,21 +65,21 @@ object Input {
 
     operator fun invoke(day : Int, testID : Int = 0) : Input {
         if (testID == 0) {
-            val path = Path.of(day.toString(2) + ".txt")
+            val path = Path.of(BASE_PATH + day.toString(2) + ".txt")
             if (path.exists()) {
                 content = Files.readAllLines(path)
             } else {
                 error("File \"${path.name}\" does not exist!")
             }
         } else if (testID == 1) {
-            val path = Path.of(day.toString(2) + "-Test.txt")
+            val path = Path.of(BASE_PATH + day.toString(2) + "-Test.txt")
             if (path.exists()) {
                 content = Files.readAllLines(path)
             } else {
                 error("File \"${path.name}\" does not exist!")
             }
         } else {
-            val path = Path.of(day.toString(2) + "-Test" + testID + ".txt")
+            val path = Path.of(BASE_PATH + day.toString(2) + "-Test" + testID + ".txt")
             if (path.exists()) {
                 content = Files.readAllLines(path)
             } else {
