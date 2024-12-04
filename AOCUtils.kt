@@ -283,3 +283,45 @@ infix fun Int.over(that : Int) = this.toLong() over that.toLong()
 fun BigInteger.toFraction() = Fraction(this)
 fun Long.toFraction() = this over 1L
 fun Int.toFraction() = this over 1
+
+fun mainDiagonalRight(l: List<CharSequence>, c: Coordinate): String {
+    val sb = StringBuilder()
+    for (i in 0..min(c.y, l[0].length - c.x - 1)) {
+        sb.append(l[c.y - i][c.x + i])
+    }
+    return sb.toString()
+}
+
+fun secondDiagonalRight(l: List<CharSequence>, c: Coordinate): String {
+    val sb = StringBuilder()
+    for (i in 0..<min(l.size - c.y, l[0].length - c.x)) {
+        sb.append(l[c.y + i][c.x + i])
+    }
+    return sb.toString()
+}
+
+fun Iterable<CharSequence>.horizontalMatches(s: String) = map { Regex.fromLiteral(s).findAll(it).toList() }
+fun List<CharSequence>.verticalMatches(s: String): List<List<MatchResult>> {
+    val list = MutableList(minByOrNull { it.length }?.length ?: 0) {""}
+    for (i in indices) {
+        for (j in indices) {
+            list[j] = list[j] + this[i][j]
+        }
+    }
+    return list.horizontalMatches(s)
+}
+fun List<CharSequence>.diagonalMatches(s: String, mainDiagonal: Boolean): List<List<MatchResult>> {
+    return if (mainDiagonal) {
+        List(size) { it }.map { Coordinate(0, it) }.map { mainDiagonalRight(this, it) }.map { Regex.fromLiteral(s).findAll(it) } +
+                List(maxOf { it.length } - 1) { it + 1 }.
+                map { Coordinate(it, size - 1) }.map { mainDiagonalRight(this, it) }.
+                map { Regex.fromLiteral(s).findAll(it) }
+    } else {
+        List(size) { it }.map { Coordinate(0, it) }.map { secondDiagonalRight(this, it) }.map { Regex.fromLiteral(s).findAll(it) } +
+                List(maxOf { it.length } - 1) { it + 1 }.
+                map { Coordinate(it, 0) }.map { secondDiagonalRight(this, it) }.
+                map { Regex.fromLiteral(s).findAll(it) }
+    }.map { it.toList() }
+}
+
+fun <I, T: Iterable<I>>Iterable<T>.flatten() = flatMap { it }
