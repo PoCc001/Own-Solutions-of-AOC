@@ -190,6 +190,9 @@ data class Coordinate(val x : Int, val y : Int) {
         Direction.LEFT -> left(amount)
     }
     override fun toString() = "($x, $y)"
+    
+    operator fun plus(other: Coordinate) = Coordinate(x + other.x, y + other.y)
+    operator fun minus(other: Coordinate) = Coordinate(x - other.x, y - other.y)
 }
 
 enum class Direction {
