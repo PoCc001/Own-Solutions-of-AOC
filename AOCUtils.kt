@@ -1,10 +1,13 @@
 import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.*
 import kotlin.io.path.exists
 import kotlin.io.path.name
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sign
 
 const val BASE_PATH = "Input"
 
@@ -47,7 +50,7 @@ object Input {
         }
     var columns : List<String> = listOf()
         get() = if (field.isEmpty()) {
-            val list = MutableList(content.minBy { it.length }?.length ?: 0) {""}
+            val list = MutableList(content.minByOrNull { it.length }?.length ?: 0) {""}
             for (i in content.indices) {
                 for (j in content[i].indices) {
                     list[j] = list[j] + content[i][j]
@@ -190,7 +193,7 @@ data class Coordinate(val x : Int, val y : Int) {
         Direction.LEFT -> left(amount)
     }
     override fun toString() = "($x, $y)"
-    
+
     operator fun plus(other: Coordinate) = Coordinate(x + other.x, y + other.y)
     operator fun minus(other: Coordinate) = Coordinate(x - other.x, y - other.y)
 }
@@ -247,6 +250,8 @@ class Fraction : Comparable<Fraction> {
 
     fun signum() = numerator.signum()
 
+    fun abs() = if (signum() == -1) -this else this
+
     override infix fun compareTo(other: Fraction): Int {
         return if (signum() > other.signum()) {
             1
@@ -279,6 +284,11 @@ class Fraction : Comparable<Fraction> {
         var result = numerator.hashCode()
         result = 31 * result + denominator.hashCode()
         return result
+    }
+
+    companion object {
+        val ZERO = Fraction(BigInteger.ZERO, BigInteger.ONE)
+        val ONE = Fraction(BigInteger.ONE, BigInteger.ONE)
     }
 }
 infix fun BigInteger.over(that : BigInteger) = Fraction(this, that)
@@ -329,3 +339,42 @@ fun List<CharSequence>.diagonalMatches(s: String, mainDiagonal: Boolean): List<L
 }
 
 fun <I, T: Iterable<I>>Iterable<T>.flatten() = flatMap { it }
+
+fun eea(l1: Long, l2: Long): Triple<Long, Long, Long> {
+    var g = l1
+    var u = 1L
+    var v = 0L
+    var g2 = l2
+    var u2 = 0L
+    var v2 = 1L
+    while (g2 != 0L) {
+        val q = g / g2
+        val tmpg2 = g - q * g2
+        val tmpu2 = u - q * u2
+        val tmpv2 = v - q * v2
+        g = g2
+        u = u2
+        v = v2
+        g2 = tmpg2
+        u2 = tmpu2
+        v2 = tmpv2
+    }
+    return Triple(g.absoluteValue, u * g.sign, v * g.sign)
+}
+
+fun lcm(l1: Long, l2: Long): Long {
+    val (gcd, _, _) = eea(l1, l2)
+    return (l1.absoluteValue / gcd) * (l2.absoluteValue / gcd)
+}
+
+fun diophantineEquation(a: Long, b: Long, c: Long): Optional<Pair<Pair<Long, Long>, Pair<Long, Long>>> {
+    val (gcd, u, v) = eea(a, b)
+    val u2 = b / gcd
+    val v2 = -a / gcd
+    val q = c / gcd
+    return if (q * gcd != c) {
+        Optional.empty()
+    } else {
+        Optional.of((q * u to q * v) to (u2 to v2))
+    }
+}
