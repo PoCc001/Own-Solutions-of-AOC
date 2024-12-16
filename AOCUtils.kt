@@ -199,7 +199,31 @@ data class Coordinate(val x : Int, val y : Int) {
 }
 
 enum class Direction {
-    UP, RIGHT, DOWN, LEFT
+    UP, RIGHT, DOWN, LEFT;
+
+    operator fun unaryMinus() =
+        when (this) {
+            UP -> DOWN
+            RIGHT -> LEFT
+            DOWN -> UP
+            LEFT -> RIGHT
+        }
+
+    fun clockwise() =
+        when (this) {
+            UP -> RIGHT
+            RIGHT -> DOWN
+            DOWN -> LEFT
+            LEFT -> UP
+        }
+
+    fun counterClockwise() =
+        when (this) {
+            UP -> LEFT
+            RIGHT -> UP
+            DOWN -> RIGHT
+            LEFT -> LEFT
+        }
 }
 
 fun <T, R>Sequence<T>.cross(that : Sequence<R>) = flatMap { first -> that.flatMap { second -> sequenceOf(first to second) } }
