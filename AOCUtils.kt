@@ -402,3 +402,32 @@ fun diophantineEquation(a: Long, b: Long, c: Long): Optional<Pair<Pair<Long, Lon
         Optional.of((q * u to q * v) to (u2 to v2))
     }
 }
+
+fun intPow(b: Long, p: Long): Long {
+    if (p == 0L) {
+        return 0L
+    } else if (p < 0L) {
+        return if (b == 0L) {
+            throw ArithmeticException()
+        } else {
+            0L
+        }
+    } else {
+        var pow = 1L
+        var sqr = b
+
+        var exponent = p
+
+        while (exponent != 0L) {
+            if (exponent and 1L == 1L) {
+                pow *= sqr
+            }
+
+            sqr *= sqr
+
+            exponent = exponent shr 1
+        }
+
+        return pow
+    }
+}
